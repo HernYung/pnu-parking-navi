@@ -864,7 +864,7 @@ $('evSel').addEventListener('change',e=>{S.ev=e.target.value;drawEvent();if(S.mo
 $('approveBtn').addEventListener('click',()=>{let n=0;S.resv.forEach(r=>{if(r.status==='review'){r.status='refunded';n++}});persist();if(S.mode==='home')render();$('approveBtn').textContent=n?`${n}건 승인 · 페이백 완료`:'승인할 증빙 없음';setTimeout(()=>{$('approveBtn').textContent='예약 증빙 승인(관리자)'},2500)});
 function gpsUI(){setPressed('#locMode',S.loc);$('gateSel').value=S.start;$('gateSel').disabled=S.loc==='gps';const m=$('gpsMsg');
   if(S.loc!=='gps'){m.textContent=`${S.start}에서 출발하는 것으로 안내합니다.`;return}
-  if(GPS.err){m.textContent=`${GPS.err}. ${S.start} 기준으로 안내합니다. (게시된 링크에서는 위치 권한을 쓸 수 없고, HTML 파일을 브라우저에서 직접 열거나 https 주소로 올리면 실제 위치를 씁니다.)`;return}
+  if(GPS.err){m.textContent=`${GPS.err}. 지금은 ${S.start} 기준으로 안내합니다. 브라우저 주소창의 위치 권한을 허용하고 새로고침하면 실제 위치로 안내합니다. (claude.ai 미리보기 링크에서는 위치를 쓸 수 없어 https://hernyung.github.io/pnu-parking-navi/ 에서 열어 주세요.)`;return}
   if(!GPS.fix){m.textContent='위치 확인 중… 브라우저에서 위치 권한을 허용해 주세요.';return}
   const p=gpsXY();m.textContent=inGrid(p.x,p.y)?`현재 위치 사용 중 · 정확도 ±${GPS.acc}m`:`캠퍼스 밖(정문에서 ${fmtDist(Math.hypot(p.x,p.y))}) · 가장 가까운 ${nearestGate(p.x,p.y)}부터 안내 · ±${GPS.acc}m`}
 let lastStart=null;function onGps(){if(S.mode!=='pick'||fly||drag)return;const n=startNode();if(n!==lastStart){lastStart=n;render()}}
