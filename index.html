@@ -9,9 +9,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="주차내비">
+<meta name="apple-mobile-web-app-title" content="JARI">
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
-<title>PNU 주차내비</title>
+<title>JARI 자리</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -293,7 +293,7 @@ a{color:var(--pnu)}
 
 <div class="stage">
   <div class="phone" id="phone">
-    <div class="loading" id="loading"><div class="lg">P</div><b>PNU 주차내비</b><div class="sp"></div><span style="font-size:12px;opacity:.8">부산대학교 3D 지도를 불러오는 중…</span></div>
+    <div class="loading" id="loading"><div class="lg">P</div><b>JARI</b><div class="sp"></div><span style="font-size:12px;opacity:.8">부산대학교 3D 지도를 불러오는 중…</span></div>
     <canvas id="gl" aria-label="부산대학교 부산캠퍼스 3D 지도"></canvas>
     <div id="labels"></div>
     <div class="status"><span id="sbTime">--:--</span><span id="sbDate"></span></div>
@@ -594,7 +594,7 @@ function updateWalk(){if(S.mode!=='walk'||!R)return;const k=INS.findIndex(i=>i.a
   const set=(id,v,h)=>{const e=document.getElementById(id);if(!e)return;if(h){if(e.innerHTML!==v)e.innerHTML=v}else if(e.textContent!==v)e.textContent=v};
   const min=Math.max(1,Math.round(remain/67+R.climb*(remain/R.len)/7)),clock=S.live?new Date().getHours()+new Date().getMinutes()/60:S.hour;
   set('navIc',IC[cur.type],1);set('navDist',fmtDist(cur.at-navS));set('navTxt',cur.text);set('navNext',nx?'그다음 '+nx.text:'');set('navEta',min+'분');set('navEtaSub',`${fmtDist(remain)} · ${fmt(clock+min/60)} 도착`)}
-function renderWalkDone(){ui.innerHTML=`<div class="head"><div class="brandrow"><div class="logo"><i>P</i>PNU 주차내비<small>도착</small></div></div></div>
+function renderWalkDone(){ui.innerHTML=`<div class="head"><div class="brandrow"><div class="logo"><i>P</i>JARI<small>도착</small></div></div></div>
   <div class="sheet notab">${grabHtml()}<h2 class="dragzone">${esc(short(R.lot.name))}에 도착했어요</h2><div class="msg ok">걸은 거리 ${fmtDist(R.len)}${R.climb>=5?` · 오르막 ${R.climb}m`:''}.</div>
   <button class="primary" id="homeBtn" type="button">처음으로</button></div>`}
 
@@ -824,7 +824,7 @@ function notices(){const n=[];
   n.push(['','안내','하역·승하차 구역 이용 시간','하역 15분, 승하차 10분, 단기정차 15분. 시간이 지나면 앱이 알려 드립니다.']);
   n.push(['','안내','빈자리 정보 기준','주차장 차단기 입·출차 기록으로 계산합니다(도입 예정). 지금 화면의 빈자리 수는 예시 값입니다.']);
   n.push(['','안내',weekend()?'주말 운영':'평일 혼잡 시간','평일 09:00~16:30에 건물 앞 주차장이 먼저 찹니다. 종일 주차는 경암체육관·공영 주차장 이용을 권합니다.']);return n}
-function headHome(){return `<div class="head"><div class="brandrow"><div class="logo"><i>P</i>PNU 주차내비<small>부산캠퍼스</small></div><button class="iconbtn" type="button" id="ovBtn">전체 지도</button></div>
+function headHome(){return `<div class="head"><div class="brandrow"><div class="logo"><i>P</i>JARI<small>자리 · 부산캠퍼스</small></div><button class="iconbtn" type="button" id="ovBtn">전체 지도</button></div>
   <label class="search">${IC.search}<input id="q" type="search" placeholder="건물 이름을 입력하세요 (예: 인문관)" value="${esc(S.q)}" autocomplete="off"></label>
   ${EV().bar?`<div class="notice-bar">📢 ${EV().bar}</div>`:''}</div>`}
 const segHtml=(id,opts,val)=>`<div class="seg" id="${id}">${opts.map(([v,t,s])=>`<button type="button" data-v="${v}" aria-pressed="${String(v)===String(val)}">${t}${s?`<small>${s}</small>`:''}</button>`).join('')}</div>`;
@@ -958,7 +958,7 @@ function renderNav(){
 }
 function renderArrive(){
     const lot=R.lot,b=DEST.find(x=>x.n===S.dest),w=walkInfo(lot,b);
-    ui.innerHTML=`<div class="head"><div class="brandrow"><div class="logo"><i>P</i>PNU 주차내비<small>도착</small></div></div></div>
+    ui.innerHTML=`<div class="head"><div class="brandrow"><div class="logo"><i>P</i>JARI<small>도착</small></div></div></div>
       <div class="sheet notab ${S.sheet==='mid'?'':S.sheet}">${grabHtml()}<h2 class="dragzone">${lot.name}에 도착했어요</h2>
       <div class="msg ok">지금 빈자리 <b>${freeAt(lot)}</b>칸. 주차 후 <b>${short(b.n)}</b>까지 걸어서 <b>${w.min}분</b>(${fmtDist(w.m)})${w.climb>=5?`, 오르막 ${w.climb}m`:''}. 초록 점을 따라 걸어가세요.</div>
       ${lot.kind!=='lot'?`<div class="msg warn">${KIND[lot.kind]}만 쓸 수 있는 구역입니다. 남은 시간은 "내 차" 탭에서 알려 드립니다.</div>`:''}
@@ -1058,7 +1058,7 @@ const MENU=[['quiz','🧠','오늘의 퀴즈','하루 한 번 · 시간 안에 �
   ['walk','🚶','걸어서 길찾기','차 없이 건물까지 도보 안내'],['settings','⚙️','설정','야간 화면 · 큰 글씨 · 음성'],['install','📲','앱으로 설치','홈 화면에 추가해 전체 화면으로'],['demo','🛠️','시연 도구','시각·위치·이벤트 바꾸기(발표용)'],['about','ℹ️','앱 정보','데이터 출처와 안내']];
 // --- 퀴즈 ---
 const QUIZ=[
- ['하역구역에는 최대 몇 분까지 세울 수 있을까요? (PNU 주차내비 기준)',['5분','15분','30분','1시간'],1],
+ ['하역구역에는 최대 몇 분까지 세울 수 있을까요? (이 앱 기준)',['5분','15분','30분','1시간'],1],
  ['승하차구역의 정차 가능 시간은?',['3분','10분','20분','제한 없음'],1],
  ['지도에서 주차장 아이콘이 빨간색이면?',['여유','혼잡','만차','공사 중'],2],
  ['예약비를 돌려받으려면 무엇이 필요할까요?',['리뷰 작성','학교 업무 증빙 승인','친구 추천','앱 재설치'],1],
@@ -1143,14 +1143,14 @@ function histHtml(){const h=S.hist;if(!h.length)return`<h3 style="margin-top:12p
   return`<h3 style="margin-top:12px">내 주차 기록</h3><div class="ptsbox"><span>총 ${h.length}회 · 평균 도보 ${avg}분</span><b style="font-size:14px">${esc(top[0])}</b></div><p class="zn" style="margin-top:4px">가장 자주 쓴 주차장: ${esc(top[0])} (${top[1]}회)</p>
   ${h.slice(0,20).map(x=>`<div class="ntc"><b>${esc(x.lot)}</b><span>${new Date(x.t).toLocaleString('ko-KR')} · ${esc(short(x.dest))}까지 도보 ${x.walk}분</span></div>`).join('')}`}
 const toLL=(x,y)=>({lat:(LAT0-y/KY).toFixed(6),lon:(LON0+x/KX).toFixed(6)});
-function shareText(){const sv=S.saved;if(!sv)return'';const ll=toLL(sv.x,sv.y);return`내 차 위치: 부산대 ${sv.name}\n위도 ${ll.lat}, 경도 ${ll.lon}\n주차 시각 ${new Date(sv.t).toLocaleTimeString('ko-KR')}\nPNU 주차내비: https://hernyung.github.io/pnu-parking-navi/`}
+function shareText(){const sv=S.saved;if(!sv)return'';const ll=toLL(sv.x,sv.y);return`내 차 위치: 부산대 ${sv.name}\n위도 ${ll.lat}, 경도 ${ll.lon}\n주차 시각 ${new Date(sv.t).toLocaleTimeString('ko-KR')}\nJARI(자리) 주차 안내: https://hernyung.github.io/pnu-parking-navi/`}
 function shareHtml(){if(!S.saved)return`<h3 style="margin-top:12px">주차 위치 공유</h3><p class="zn">먼저 주차 위치를 저장해 주세요.</p>`;
   return`<h3 style="margin-top:12px">주차 위치 공유</h3><textarea id="shTxt" class="btn field" readonly style="min-height:110px">${esc(shareText())}</textarea><button class="primary" id="shCopy" type="button">복사하기</button>`}
 function settingsHtml(){return`<h3 style="margin-top:12px">설정</h3><div class="lbl">야간 화면</div>${segHtml('setNight',[['auto','시간 따라 자동'],['on','항상 켜기'],['off','끄기']],S.nightMode)}
   <div class="lbl">글씨 크기</div>${segHtml('setBig',[['0','보통'],['1','크게']],S.bigText?'1':'0')}
   <div class="lbl">음성 안내</div>${segHtml('setVoice',[['1','켜기'],['0','끄기']],S.voice?'1':'0')}
   <p class="zn" style="margin-top:12px">지금 ${fmt(S.hour)} · ${dayAmt(S.hour)>.5?'낮':'밤'} 화면 (일출 약 07:05, 일몰 약 17:20 기준)</p>`}
-function aboutHtml(){return`<h3 style="margin-top:12px">앱 정보</h3><p style="font-size:13px">PNU 주차내비는 부산대 차량 이용자에게 주차장 위치와 빈자리를 이용자 관점에서 알려 주는 HTML 앱 프로토타입이에요.</p>
+function aboutHtml(){return`<h3 style="margin-top:12px">앱 정보</h3><p style="font-size:13px">JARI(자리)는 부산대 차량 이용자에게 주차장 위치와 빈자리를 이용자 관점에서 알려 주는 HTML 앱 프로토타입이에요.</p>
   <p class="zn" style="font-size:12.5px">지도: © OpenStreetMap 기여자(ODbL) · 지형: SRTM 30 m · 3D: three.js<br>빈자리 수, 예약·포인트·쿠폰·신고 처리는 시연용이에요. 기록은 이 기기의 브라우저에만 저장돼요.</p>`}
 let installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;showInstallBar()});
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;

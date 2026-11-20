@@ -1,6 +1,6 @@
 {
- "name": "PNU 주차내비",
- "short_name": "주차내비",
+ "name": "JARI 자리",
+ "short_name": "JARI",
  "description": "부산대 캠퍼스 3D 주차 내비게이션",
  "lang": "ko",
  "start_url": "./",
