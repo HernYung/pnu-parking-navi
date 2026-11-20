@@ -3,8 +3,17 @@
 <head>
 <meta charset="utf-8">
 <style>html,body{margin:0}</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="주차내비">
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
 <title>PNU 주차내비</title>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b4ea2">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
@@ -18,7 +27,7 @@
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
 }
 *{box-sizing:border-box}
-html,body{background:var(--page);color:var(--ink)}
+html,body{margin:0;background:var(--page);color:var(--ink)}
 body{font-family:var(--sans);font-size:14px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
 button,input,select{font:inherit;color:inherit}
@@ -27,7 +36,79 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .stage{display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 .phone{position:relative;width:min(400px,100%);height:min(840px,calc(100svh - 32px));min-height:600px;border-radius:38px;overflow:hidden;
   background:#d7e7f2;border:10px solid #121821;box-shadow:0 24px 60px #0b1d3a40}
-@media (max-width:700px){.phone{border-width:0;border-radius:18px}}
+html.appmode,html.appmode body{height:100%;overflow:hidden;overscroll-behavior:none;background:#08367a}
+html.appmode body{padding:0}
+html.appmode .stage{display:block}
+html.appmode .phone{width:100vw;height:100dvh;min-height:0;border:0;border-radius:0;box-shadow:none}
+html.appmode .status{display:none}
+html.appmode .head,html.appmode .turn{padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+html.appmode .tabbar{height:calc(60px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)}
+html.appmode .sheet{bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+html.appmode .sheet.notab{bottom:0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+html.appmode .navbar{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+html.appmode .drawer header{padding-top:calc(env(safe-area-inset-top,0px) + 14px)}
+html.appmode .toast{top:calc(env(safe-area-inset-top,0px) + 96px)}
+html.appmode .stage>.panel{display:none}
+.panel.inDrawer{display:flex!important;width:100%;gap:10px}
+.panel.inDrawer .card{padding:12px;border-radius:12px}
+.phone{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.phone input,.phone textarea{-webkit-user-select:text;user-select:text}
+.phone button{transition:transform .12s ease,box-shadow .25s ease,background-color .2s}
+.phone button:active:not(:disabled){transform:scale(.96)}
+/* 화면 바뀔 때 시트가 올라오는 효과 */
+@keyframes sheetUp{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeDown{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+#ui.enter .sheet,#ui.enter .navbar{animation:sheetUp .32s cubic-bezier(.2,.8,.2,1)}
+#ui.enter .head,#ui.enter .turn{animation:fadeDown .3s ease-out}
+/* 은은한 아우라 */
+@keyframes aura{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.22);opacity:.18}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sheen{0%{transform:translateX(-120%)}60%,100%{transform:translateX(220%)}}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.fabmenu{isolation:isolate;background:radial-gradient(circle at 35% 30%,#3d7fe0,#0b4ea2 60%,#08367a);box-shadow:0 8px 22px #0b4ea270,0 0 0 1px #ffffff30 inset}
+.fabmenu::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,#5b97ff80 0%,#5b97ff00 70%);z-index:-1;animation:aura 2.8s ease-in-out infinite}
+.fabmenu::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#ffffff00,#9cc3ff99,#ffffff00 40%);z-index:-1;animation:spin 4s linear infinite;-webkit-mask:radial-gradient(circle,#0000 62%,#000 64%);mask:radial-gradient(circle,#0000 62%,#000 64%)}
+.fabmenu .badge{animation:pop 1.8s ease-in-out infinite;box-shadow:0 0 10px #e7a40099}
+.primary{position:relative;overflow:hidden;box-shadow:0 6px 18px #0b4ea24d}
+.primary::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:0;background:linear-gradient(100deg,#ffffff00,#ffffff38,#ffffff00);animation:sheen 3.6s ease-in-out infinite;pointer-events:none}
+.primary:disabled::after{display:none}
+.tabbar button[aria-selected=true] svg{filter:drop-shadow(0 0 6px #0b4ea2aa)}
+.chip.big{box-shadow:0 0 0 2px #fff,0 0 16px 2px currentColor}
+.mitem .ico{box-shadow:0 0 0 1px #0b4ea21a,0 4px 12px #0b4ea21f}
+.loading{flex-direction:column;gap:14px;background:linear-gradient(180deg,#08367a,#0b4ea2);color:#fff;font-weight:500}
+.loading .lg{width:72px;height:72px;border-radius:20px;background:#fff;color:#0b4ea2;display:grid;place-items:center;font:900 40px/1 var(--sans);box-shadow:0 0 0 8px #ffffff22,0 0 40px #8cb8ff88;animation:pop 1.6s ease-in-out infinite}
+.loading .sp{width:26px;height:26px;border-radius:50%;border:3px solid #ffffff44;border-top-color:#fff;animation:spin .9s linear infinite}
+.install{position:absolute;left:12px;right:12px;z-index:7;bottom:calc(72px + env(safe-area-inset-bottom,0px));background:#152033;color:#fff;border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 10px 24px #0005;font-size:13px}
+.install b{flex:1}.install button{border:0;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+/* 편의점 상점 */
+.store-hero{margin-top:12px;border-radius:16px;padding:14px;color:#fff;background:linear-gradient(135deg,#0a5bb8,#00a6c8);position:relative;overflow:hidden}
+.store-hero::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:#ffffff1f}
+.store-hero small{opacity:.85;font-size:11.5px}.store-hero b{display:block;font-size:24px;font-family:var(--mono);margin-top:2px}
+.cats{display:flex;gap:6px;overflow-x:auto;margin:12px 0 2px;padding-bottom:2px}
+.cats button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 12px;font-size:12.5px;white-space:nowrap;cursor:pointer}
+.cats button[aria-pressed=true]{background:#0a5bb8;border-color:#0a5bb8;color:#fff;font-weight:700}
+.prod{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.pcard{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
+.pcard .art{aspect-ratio:1/0.8;display:grid;place-items:center}
+.pcard .art svg{width:62%;height:auto}
+.pcard .info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
+.pcard .info b{font-size:13px}.pcard .info span{font-size:11px;color:var(--muted)}
+.pcard .info em{font:700 14px var(--mono);color:#0a5bb8;font-style:normal;margin-top:auto}
+.pcard button{margin:0 10px 10px;border:0;border-radius:10px;padding:8px;background:#0a5bb8;color:#fff;font-weight:700;cursor:pointer}
+.pcard button:disabled{background:var(--soft);color:var(--muted);cursor:default}
+.ticket{position:relative;margin-top:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);overflow:hidden;box-shadow:0 6px 16px #0b1d3a14}
+.ticket .top{display:flex;gap:10px;align-items:center;padding:12px;background:linear-gradient(135deg,#0a5bb810,#00a6c814)}
+.ticket .top .mini{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;flex:none}
+.ticket .top .mini svg{width:34px}
+.ticket .cut{height:0;border-top:2px dashed var(--line);margin:0 14px;position:relative}
+.ticket .cut::before,.ticket .cut::after{content:"";position:absolute;top:-9px;width:16px;height:16px;border-radius:50%;background:var(--page)}
+.ticket .cut::before{left:-22px}.ticket .cut::after{right:-22px}
+.ticket .bc{padding:10px 14px 12px;position:relative}
+.ticket .bc svg{display:block;width:100%;height:58px;background:#fff;border-radius:6px}
+.ticket .bc .wm{position:absolute;inset:10px 14px 30px;display:grid;place-items:center;color:#d0342c;font-weight:900;font-size:15px;letter-spacing:.08em;transform:rotate(-8deg);text-shadow:0 0 6px #fff}
+.ticket .bc code{display:block;text-align:center;font:600 12px var(--mono);letter-spacing:.2em;margin-top:4px}
+.ticket.used{opacity:.5}
+@media (prefers-reduced-motion:reduce){.fabmenu::before,.fabmenu::after,.primary::after,.fabmenu .badge,.loading .lg{animation:none}#ui.enter .sheet,#ui.enter .navbar,#ui.enter .head,#ui.enter .turn{animation:none}}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .lb{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;font-size:10px;font-weight:500;color:#26324a;
@@ -72,7 +153,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .sheet{position:absolute;left:0;right:0;bottom:58px;z-index:4;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:0 -6px 24px #0b1d3a2e;
   max-height:36%;overflow:auto;padding:0 16px 16px;overscroll-behavior:contain;transition:max-height .25s}
 .sheet.big{max-height:72%}
-.sheet.mini{max-height:92px!important;overflow:hidden}
+.sheet.mini{max-height:64px!important;overflow:hidden}
+.sheet.mini .dragzone~*,.sheet.mini>:not(.grabbtn):not(.dragzone):not(.toprow):not(h2){visibility:hidden}
 .sheet.notab.big{max-height:82%}
 .sheet.dragging{transition:none}
 .grabbtn,.dragzone{touch-action:none;cursor:grab}
@@ -211,7 +293,7 @@ a{color:var(--pnu)}
 
 <div class="stage">
   <div class="phone" id="phone">
-    <div class="loading" id="loading">부산대학교 3D 지도를 불러오는 중…</div>
+    <div class="loading" id="loading"><div class="lg">P</div><b>PNU 주차내비</b><div class="sp"></div><span style="font-size:12px;opacity:.8">부산대학교 3D 지도를 불러오는 중…</span></div>
     <canvas id="gl" aria-label="부산대학교 부산캠퍼스 3D 지도"></canvas>
     <div id="labels"></div>
     <div class="status"><span id="sbTime">--:--</span><span id="sbDate"></span></div>
@@ -501,7 +583,7 @@ function walkInstr(R){const out=[];const bear=(p,q)=>Math.atan2(q.x-p.x,-(q.y-p.
     if(Math.abs(t)<40)continue;if(out.length&&R.cum[k]-out[out.length-1].at<12)out.pop();const dir=t>0?'right':'left';
     out.push({at:R.cum[k],type:dir,text:`${dir==='right'?'오른쪽':'왼쪽'}으로 · ${short(nearestNamed(v.x,v.y).n)} 방면`})}
   out.push({at:R.len,type:'arrive',text:`${short(R.lot.name)} 도착`});return out}
-function startWalk(from,b,label){const r=routeWalk(from,b);if(!r){toast('걸어서 갈 길을 찾지 못했어요.');return}
+function startWalk(from,b,label){keepAwake();const r=routeWalk(from,b);if(!r){toast('걸어서 갈 길을 찾지 못했어요.');return}
   R=r;INS=walkInstr(R);navS=0;S.walkGps=useGps()&&inGrid(gpsXY().x,gpsXY().y);spoken.clear();promptOpen=false;fly=null;S.mode='walk';S.walkFrom=label;followOff=false;car.visible=false;walker.visible=true;clearGroup(walkGroup);drawRoute(R);closeDrawer();
   speak(`도보 안내를 시작합니다. ${short(b.n)}까지 약 ${Math.max(1,Math.round(R.len/67+R.climb/7))}분입니다.`);render()}
 function renderWalk(){ui.innerHTML=`<div class="turn"><div class="ic" id="navIc"></div><div class="dist" id="navDist"></div><button class="vo" id="voBtn" type="button" aria-pressed="${S.voice}">${S.voice?'🔊<br>음성':'🔇<br>끔'}</button><div class="txt" id="navTxt"></div><div class="next" id="navNext"></div></div>
@@ -791,8 +873,10 @@ function resvBody(){const rv=S.rv;const lots=LOTS.filter(l=>!l.out&&!l.temp&&(l.
 function updateStatus(){const n=new Date();document.getElementById('sbTime').textContent=S.live?fmt(n.getHours()+n.getMinutes()/60):fmt(S.hour)+' 시연';
   document.getElementById('sbDate').textContent=`${S.live?n.getMonth()+1+'/'+n.getDate():''}(${DOW[S.day]})${useGps()?' · GPS':''}`}
 const grabHtml=()=>`<button class="grabbtn" id="grabBtn" type="button" aria-label="끌어서 목록 크기 조절"><div class="grab"></div></button>`;
+let lastMode=null;
 function render(){
-  updateStatus();
+  updateStatus();if(S.mode!=='home'||S.tab!=='map')ensureGuard();
+  if(S.mode!==lastMode){lastMode=S.mode;ui.classList.add('enter');clearTimeout(render.t);render.t=setTimeout(()=>ui.classList.remove('enter'),400)}
   if(drag)return;
   if(S.mode==='home'){
     ui.innerHTML=headHome()+homeSheetHtml()+tabbar();bindHomeSheet();
@@ -880,7 +964,7 @@ function renderArrive(){
       ${lot.kind!=='lot'?`<div class="msg warn">${KIND[lot.kind]}만 쓸 수 있는 구역입니다. 남은 시간은 "내 차" 탭에서 알려 드립니다.</div>`:''}
       <button class="primary" id="parkBtn" type="button">주차 완료 · 위치 저장</button><button class="ghost" id="walkBtn" type="button">🚶 저장하고 도보 안내 시작</button><button class="ghost" id="homeBtn" type="button">저장하지 않고 처음으로</button></div>`;
 }
-function goHome(tab='map'){walker.visible=false;S.mode='home';S.tab=tab;S.target=null;S.dest=null;S.resvLot=null;S.sheet='mid';sheetScroll=0;R=null;car.visible=false;promptOpen=false;clearGroup(routeGroup);clearGroup(walkGroup);highlight(null);render();overview()}
+function goHome(tab='map'){releaseWake();walker.visible=false;S.mode='home';S.tab=tab;S.target=null;S.dest=null;S.resvLot=null;S.sheet='mid';sheetScroll=0;R=null;car.visible=false;promptOpen=false;clearGroup(routeGroup);clearGroup(walkGroup);highlight(null);render();overview()}
 function fitRoute(){if(!R)return;const b=DEST.find(x=>x.n===S.dest);fitPts(R.pts.map(p=>[p.x,p.y]).concat([[b.x,b.y]]))}
 function updateCarTimer(){const sv=S.saved;const e=document.getElementById('carBig');if(!sv||!e)return;const mins=Math.floor((Date.now()-sv.t)/60000),lim=LIMIT[sv.kind];e.textContent=`${Math.floor(mins/60)}시간 ${mins%60}분`;
   const L=document.getElementById('carLim');if(L&&lim){const left=lim-mins;L.className='msg '+(left<=3?'full':'warn');L.innerHTML=`${KIND[sv.kind]} 구역입니다. ${left>0?`남은 시간 <b>${left}분</b>`:`<b>${-left}분 초과</b> · 차를 옮겨 주세요`}.`}}
@@ -929,7 +1013,7 @@ ui.addEventListener('click',e=>{
   if(t.id==='acceptRe'){reroute(t.dataset.id);return}
   if(t.id==='keepRe'){dismissed.add(R.lot.id);promptOpen=false;render();return}
 });
-function startNav(){if(!R)return;fly=null;INS=instructions(R);navS=0;spoken.clear();dismissed.clear();promptOpen=false;S.mode='nav';car.visible=true;followOff=false;S.navGps=useGps()&&inGrid(gpsXY().x,gpsXY().y);drawRoute(R);
+function startNav(){if(!R)return;keepAwake();fly=null;INS=instructions(R);navS=0;spoken.clear();dismissed.clear();promptOpen=false;S.mode='nav';car.visible=true;followOff=false;S.navGps=useGps()&&inGrid(gpsXY().x,gpsXY().y);drawRoute(R);
   speak(`안내를 시작합니다. ${R.lot.name}까지 약 ${Math.max(1,Math.ceil(R.len/333))}분입니다.`);render()}
 function fwdNode(){const p=pointAt(R,navS);let k=p.i;while(k<R.pts.length&&typeof R.pts[k].id!=='number')k++;let from=k<R.pts.length?R.pts[k].id:null;
   if(from==null||(SHUTS[S.ev]&&SHUTS[S.ev].size&&!(DRV.get(from)||[]).some(([v])=>!SHUTS[S.ev].has(from+'_'+v))))from=openNode(p.x,p.y);return{from,p}}
@@ -950,15 +1034,28 @@ function checkFull(){if(S.mode!=='nav'||promptOpen||dismissed.has(R.lot.id)||fre
 
 // ---------- 기능 메뉴(우측 하단 버튼 → 오른쪽 목록) ----------
 const drawerEl=document.getElementById('drawer'),scrimEl=document.getElementById('scrim'),fabEl=document.getElementById('menuFab');
+// 안드로이드 뒤로 가기: 앱 안에서 한 단계씩 돌아간다
+let wake=null;async function keepAwake(){try{if('wakeLock' in navigator)wake=await navigator.wakeLock.request('screen')}catch(e){}}
+function releaseWake(){try{wake&&wake.release()}catch(e){}wake=null}
+function ensureGuard(){try{if(!history.state||!history.state.pnu)history.pushState({pnu:1},'')}catch(e){}}
+function appBack(){if(S.drawerOpen){if(S.panel){S.panel=null;renderDrawer()}else closeDrawer();return}
+  if(promptOpen){const k=document.getElementById('keepRe');if(k)k.click();return}
+  if(S.mode==='nav'){const b=document.getElementById('stopBtn');if(b)b.click();return}
+  if(S.mode==='pick'){const b=document.getElementById('backBtn');if(b)b.click();else goHome();return}
+  if(S.mode!=='home'){goHome();return}
+  if(S.tab!=='map'){S.tab='map';render();return}}
+window.addEventListener('popstate',()=>{const was=S.mode!=='home'||S.drawerOpen||S.tab!=='map';if(!was)return;appBack();if(S.mode!=='home'||S.drawerOpen||S.tab!=='map')ensureGuard()});
+phone.addEventListener('click',e=>{if(e.target.closest('button'))try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}},true);
+function setAppMode(){const on=innerWidth<=700||isStandalone();document.documentElement.classList.toggle('appmode',on)}
 let toastT=null;function toast(m){let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';phone.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true},3200)}
-function openDrawer(panel=null){S.drawerOpen=true;S.panel=panel;renderDrawer();drawerEl.classList.add('open');scrimEl.hidden=false}
-function closeDrawer(){S.drawerOpen=false;stopQuizTimer();drawerEl.classList.remove('open');scrimEl.hidden=true}
+function openDrawer(panel=null){ensureGuard();S.drawerOpen=true;S.panel=panel;renderDrawer();drawerEl.classList.add('open');scrimEl.hidden=false}
+function closeDrawer(){S.drawerOpen=false;stopQuizTimer();if(panelEl&&panelEl.parentElement!==stageEl){panelEl.classList.remove('inDrawer');stageEl.appendChild(panelEl)}drawerEl.classList.remove('open');scrimEl.hidden=true}
 function placeFab(){const show=S.mode==='home'||S.mode==='pick'||S.mode==='walkDone'||S.mode==='arrive';fabEl.hidden=!show;if(!show)return;const sh=ui.querySelector('.sheet');
   const b=(sh?sh.getBoundingClientRect().height:0)+(S.mode==='home'?58:0)+12;fabEl.style.bottom=Math.min(phone.clientHeight-200,b)+'px';
   fabEl.innerHTML='☰'+(quizAvailable()?'<span class="badge">퀴즈</span>':'')}
-const MENU=[['quiz','🧠','오늘의 퀴즈','하루 한 번 · 시간 안에 맞히면 포인트'],['shop','🏪','포인트 상점','교내 GS25 상품으로 교환'],['report','🚨','불법주차·통행 방해 신고','사진과 위치로 신고'],
+const MENU=[['quiz','🧠','오늘의 퀴즈','하루 한 번 · 시간 안에 맞히면 포인트'],['shop','🏪','포인트 상점','교내 편의점(GS25 협업 예정) 상품 교환'],['report','🚨','불법주차·통행 방해 신고','사진과 위치로 신고'],
   ['alert','🔔','빈자리 알림','원하는 주차장에 자리가 나면 알림'],['hist','🕘','내 주차 기록','최근 주차 장소와 통계'],['share','📤','주차 위치 공유','내 차 위치를 문자로 보내기'],
-  ['walk','🚶','걸어서 길찾기','차 없이 건물까지 도보 안내'],['settings','⚙️','설정','야간 화면 · 큰 글씨 · 음성'],['about','ℹ️','앱 정보','데이터 출처와 안내']];
+  ['walk','🚶','걸어서 길찾기','차 없이 건물까지 도보 안내'],['settings','⚙️','설정','야간 화면 · 큰 글씨 · 음성'],['install','📲','앱으로 설치','홈 화면에 추가해 전체 화면으로'],['demo','🛠️','시연 도구','시각·위치·이벤트 바꾸기(발표용)'],['about','ℹ️','앱 정보','데이터 출처와 안내']];
 // --- 퀴즈 ---
 const QUIZ=[
  ['하역구역에는 최대 몇 분까지 세울 수 있을까요? (PNU 주차내비 기준)',['5분','15분','30분','1시간'],1],
@@ -998,14 +1095,28 @@ function quizHtml(){const q=S.quiz;
     <h3 style="margin:14px 0 4px;font-size:16px;line-height:1.45">${Q[0]}</h3>${Q[1].map((o,k)=>`<button class="opt ${pk!==null&&pk!==undefined?(k===Q[2]?'right':k===pk?'wrong':''):''}" data-ans="${k}" type="button" ${pk!==null&&pk!==undefined?'disabled':''}>${o}</button>`).join('')}
     <p class="zn" style="margin-top:10px">현재 ${q.score}P · 정답 ${q.right}개</p>`}
 // --- 상점(교내 GS25 협업, 시연) ---
-const SHOP=[['💧','생수 500ml',300],['🍙','삼각김밥',600],['☕','캔커피',700],['🍦','아이스크림',800],['🥪','샌드위치',1500],['🎫','GS25 1,000원 상품권',1000]];
-function barcode(code){let x=4,s='';for(const ch of code){const n=parseInt(ch,36);for(let b=0;b<4;b++){const w=1+((n>>b)&1)*2;if(b%2===0)s+=`<rect x="${x}" y="4" width="${w}" height="48" fill="#111"/>`;x+=w+1}}
+// 상품 그림(직접 그린 SVG, 실제 브랜드 이미지 아님)
+const ART={
+ water:'<svg viewBox="0 0 64 64"><rect x="24" y="4" width="16" height="7" rx="2" fill="#2a7de1"/><path d="M22 14h20l3 8v34a4 4 0 0 1-4 4H23a4 4 0 0 1-4-4V22z" fill="#cfe8ff" stroke="#7fb6ef" stroke-width="2"/><rect x="19" y="28" width="26" height="14" fill="#2a7de1"/><path d="M25 35h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><path d="M24 48c4 3 12 3 16 0" stroke="#9fcbf6" stroke-width="2" fill="none"/></svg>',
+ onigiri:'<svg viewBox="0 0 64 64"><path d="M32 6c5 0 26 36 26 44 0 5-4 8-9 8H15c-5 0-9-3-9-8C6 42 27 6 32 6z" fill="#fffaf0" stroke="#e6dcc6" stroke-width="2"/><rect x="18" y="36" width="28" height="22" rx="3" fill="#2f3b2f"/><rect x="22" y="40" width="20" height="6" rx="2" fill="#e8463a"/><circle cx="32" cy="24" r="3" fill="#e8463a"/></svg>',
+ coffee:'<svg viewBox="0 0 64 64"><rect x="18" y="6" width="28" height="6" rx="3" fill="#b9c2cc"/><rect x="16" y="11" width="32" height="47" rx="6" fill="#6b3f26"/><rect x="16" y="24" width="32" height="20" fill="#f4e3c8"/><path d="M27 30c0 5 10 5 10 0" stroke="#6b3f26" stroke-width="2.5" fill="none"/><path d="M28 27c0-2 2-2 2-4M34 27c0-2 2-2 2-4" stroke="#6b3f26" stroke-width="1.8" fill="none" stroke-linecap="round"/><rect x="16" y="52" width="32" height="6" rx="3" fill="#b9c2cc"/></svg>',
+ icecream:'<svg viewBox="0 0 64 64"><path d="M22 30h20L32 60z" fill="#e2a65a" stroke="#c8873d" stroke-width="2"/><path d="M24 34l14 6M26 42l10 4" stroke="#c8873d" stroke-width="1.6"/><circle cx="32" cy="22" r="13" fill="#ffd1dc"/><circle cx="24" cy="26" r="7" fill="#fff4c2"/><circle cx="40" cy="26" r="7" fill="#c8f0d8"/><circle cx="34" cy="12" r="3" fill="#e8463a"/></svg>',
+ sandwich:'<svg viewBox="0 0 64 64"><path d="M6 42L32 12l26 30z" fill="#f2d39b" stroke="#d9b06a" stroke-width="2"/><path d="M8 44h48l-2 6H10z" fill="#7cc36b"/><path d="M10 50h44l-2 5H12z" fill="#e8463a"/><path d="M12 55h40l-2 5H14z" fill="#f2d39b"/></svg>',
+ milk:'<svg viewBox="0 0 64 64"><path d="M20 14l4-8h16l4 8v42a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="#fff6c9" stroke="#e8d27a" stroke-width="2"/><rect x="20" y="28" width="24" height="18" fill="#f5c542"/><circle cx="32" cy="37" r="5" fill="#fff"/><path d="M24 6h16" stroke="#e8d27a" stroke-width="3"/></svg>',
+ voucher:'<svg viewBox="0 0 64 64"><rect x="4" y="16" width="56" height="32" rx="6" fill="#0a5bb8"/><circle cx="4" cy="32" r="6" fill="#e9f2ff"/><circle cx="60" cy="32" r="6" fill="#e9f2ff"/><text x="32" y="38" font-size="15" font-weight="900" text-anchor="middle" fill="#fff" font-family="sans-serif">1,000</text><path d="M14 22h36" stroke="#5aa0f0" stroke-width="2" stroke-dasharray="3 3"/></svg>',
+ cup:'<svg viewBox="0 0 64 64"><path d="M16 14h32l-4 44H20z" fill="#fff" stroke="#c9d3df" stroke-width="2"/><rect x="14" y="10" width="36" height="6" rx="3" fill="#2f3b45"/><rect x="18" y="26" width="28" height="14" fill="#00a6c8"/><path d="M28 30c0 4 8 4 8 0" stroke="#fff" stroke-width="2" fill="none"/></svg>'};
+const SHOP=[['water','생수 500ml','음료',300,'#e9f4ff'],['milk','바나나맛 우유 240ml','음료',800,'#fff8dc'],['coffee','캔커피 175ml','음료',700,'#f6ece2'],['cup','아이스 아메리카노','음료',1200,'#e5f7fb'],
+  ['onigiri','참치마요 삼각김밥','간편식',600,'#f3f6ee'],['sandwich','햄치즈 샌드위치','간편식',1500,'#fff3e6'],['icecream','콘 아이스크림','디저트',800,'#fff0f4'],['voucher','1,000원 모바일 상품권','상품권',1000,'#e9f2ff']];
+function barcode(code){/* 시연용 무늬: 실제 바코드 규격이 아님 */let x=4,s='';for(const ch of code){const n=parseInt(ch,36);for(let b=0;b<4;b++){const w=1+((n>>b)&1)*2;if(b%2===0)s+=`<rect x="${x}" y="4" width="${w}" height="48" fill="#111"/>`;x+=w+1}}
   return`<svg viewBox="0 0 ${x+4} 56" preserveAspectRatio="none" role="img" aria-label="쿠폰 바코드 ${code}">${s}</svg>`}
-function shopHtml(){return`<h3 style="margin-top:12px">포인트 상점 · 교내 GS25</h3><p class="zn" style="font-size:12.5px">교내 GS25와 협업하는 경우를 가정한 시연 화면이에요. 교환한 쿠폰의 바코드를 매장에서 보여 주세요.</p>
-  <div class="ptsbox"><span>내 포인트</span><b>${S.pts.toLocaleString()}P</b></div>
-  <div class="shop">${SHOP.map(([e,n,p],i)=>`<button type="button" data-buy="${i}" ${S.pts<p?'disabled':''}><span class="em">${e}</span><b>${n}</b><span>${p.toLocaleString()}P</span></button>`).join('')}</div>
-  <h3 style="margin-top:16px">내 쿠폰 ${S.coupons.filter(c=>!c.used).length}장</h3>${S.coupons.length?S.coupons.map((c,i)=>`<div class="coupon" style="${c.used?'opacity:.5':''}"><b>${c.e} ${c.n}</b><div class="zn">${new Date(c.t).toLocaleDateString('ko-KR')} 교환 · ${c.used?'사용 완료':'사용 전'} · ${c.code}</div>${c.used?'':barcode(c.code)}
-    ${c.used?'':`<button class="tog" style="margin-top:8px" type="button" data-use="${i}">매장에서 사용 완료(직원 확인)</button>`}</div>`).join(''):'<p class="zn">아직 없어요. 퀴즈로 포인트를 모아 보세요.</p>'}
+function shopHtml(){const cat=S.shopCat||'전체',list=SHOP.map((x,i)=>[...x,i]).filter(x=>cat==='전체'||x[2]===cat);
+  const art=k=>ART[k]||'',live=S.coupons.filter(c=>!c.used);
+  return`<div class="store-hero"><small>교내 편의점 · GS25 부산대점 협업 예정(시연)</small><b>${S.pts.toLocaleString()} P</b><small>퀴즈로 모은 포인트를 상품 쿠폰으로 바꿔요 · 1P = 1원</small></div>
+  <div class="cats">${['전체','음료','간편식','디저트','상품권'].map(c=>`<button type="button" data-cat="${c}" aria-pressed="${c===cat}">${c}</button>`).join('')}<button type="button" data-cat="쿠폰" aria-pressed="${cat==='쿠폰'}">내 쿠폰 ${live.length}</button></div>
+  ${cat==='쿠폰'?(S.coupons.length?S.coupons.map((c,i)=>{const it=SHOP.find(x=>x[1]===c.n)||[];const exp=new Date(c.t+7*864e5);return`<div class="ticket ${c.used?'used':''}"><div class="top"><span class="mini" style="background:${it[4]||'#eef3f9'}">${art(it[0])}</span><div style="min-width:0"><b>${esc(c.n)}</b><div class="zn">교내 편의점 · ${c.used?'사용 완료':'~ '+exp.toLocaleDateString('ko-KR')+'까지'}</div></div></div>
+    <div class="cut"></div><div class="bc">${barcode(c.code)}<div class="wm">시연용 · 사용 불가</div><code>${c.code}</code>${c.used?'':`<button class="tog" style="margin-top:8px;width:100%" type="button" data-use="${i}">매장 직원 확인 · 사용 완료 처리</button>`}</div></div>`}).join(''):'<p class="zn" style="margin-top:12px">아직 쿠폰이 없어요. 퀴즈로 포인트를 모아 교환해 보세요.</p>')
+  :`<div class="prod">${list.map(([k,n,c,p,bg,i])=>`<div class="pcard"><div class="art" style="background:${bg}">${art(k)}</div><div class="info"><span>${c}</span><b>${n}</b><em>${p.toLocaleString()}P</em></div><button type="button" data-buy="${i}" ${S.pts<p?'disabled':''}>${S.pts<p?`${(p-S.pts).toLocaleString()}P 부족`:'교환하기'}</button></div>`).join('')}</div>`}
+  <p class="zn" style="font-size:11.5px;margin-top:10px">상품 그림은 앱에서 직접 그린 예시예요. 협업이 확정되면 편의점이 제공하는 공식 상품 이미지와 쿠폰 바코드로 바뀝니다.</p>
   ${S.ptsLog.length?`<h3 style="margin-top:16px">포인트 내역</h3>${S.ptsLog.slice(0,10).map(l=>`<div class="ntc"><b>${esc(l.d)} <span style="float:right;color:${l.p>=0?'var(--ok)':'var(--full)'}">${l.p>=0?'+':''}${l.p}P</span></b><span>${new Date(l.t).toLocaleString('ko-KR')}</span></div>`).join('')}`:''}`}
 // --- 신고 ---
 const REPORT_T=['불법주차','통행 방해(소방·보행로)','주차장 시설 고장','기타'];
@@ -1041,11 +1152,28 @@ function settingsHtml(){return`<h3 style="margin-top:12px">설정</h3><div class
   <p class="zn" style="margin-top:12px">지금 ${fmt(S.hour)} · ${dayAmt(S.hour)>.5?'낮':'밤'} 화면 (일출 약 07:05, 일몰 약 17:20 기준)</p>`}
 function aboutHtml(){return`<h3 style="margin-top:12px">앱 정보</h3><p style="font-size:13px">PNU 주차내비는 부산대 차량 이용자에게 주차장 위치와 빈자리를 이용자 관점에서 알려 주는 HTML 앱 프로토타입이에요.</p>
   <p class="zn" style="font-size:12.5px">지도: © OpenStreetMap 기여자(ODbL) · 지형: SRTM 30 m · 3D: three.js<br>빈자리 수, 예약·포인트·쿠폰·신고 처리는 시연용이에요. 기록은 이 기기의 브라우저에만 저장돼요.</p>`}
-function renderDrawer(){const items=MENU.map(([k,e,t,d])=>`<button class="mitem" type="button" data-panel="${k}"><span class="ico">${e}</span><span><b>${t}${k==='quiz'&&quizAvailable()?' <span class="tag info">오늘 도전 가능</span>':''}</b><span class="d">${d}</span></span></button>`).join('');
-  const P={quiz:quizHtml,shop:shopHtml,report:reportHtml,alert:alertHtml,hist:histHtml,share:shareHtml,settings:settingsHtml,about:aboutHtml}[S.panel];
+let installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;showInstallBar()});
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+function installHtml(){const url='https://hernyung.github.io/pnu-parking-navi/';
+  if(isStandalone())return`<h3 style="margin-top:12px">앱으로 실행 중</h3><p class="zn" style="font-size:13px">홈 화면 아이콘으로 실행되고 있어요. 주소창 없이 전체 화면으로 동작합니다.</p>`;
+  return`<h3 style="margin-top:12px">홈 화면에 앱으로 설치</h3><p class="zn" style="font-size:13px">설치하면 아이콘을 눌러 주소창 없이 전체 화면으로 열리고, 한 번 연 지도는 인터넷이 약해도 빨리 열려요. 실제 위치(GPS)도 이 주소에서만 쓸 수 있어요.</p>
+  ${installEvt?'<button class="primary" id="doInstall" type="button">지금 설치하기</button>':''}
+  <div class="lbl">직접 설치하는 방법</div><div class="ntc"><b>안드로이드(크롬·삼성 인터넷)</b><span>아래 주소를 열고 ⋮ 메뉴 → "홈 화면에 추가" 또는 "앱 설치"</span></div>
+  <div class="ntc"><b>아이폰(사파리)</b><span>아래 주소를 사파리로 열고 공유 버튼 → "홈 화면에 추가"</span></div>
+  <div class="ntc"><b>카카오톡으로 받은 파일로 열었다면</b><span>파일 대신 아래 주소를 보내 주세요. 파일로 열면 설치와 위치 기능이 동작하지 않아요.</span></div>
+  <textarea class="btn field" readonly id="instUrl" style="min-height:44px">${url}</textarea><button class="ghost" id="copyUrl" type="button">주소 복사</button>`}
+function showInstallBar(){if(isStandalone()||sessionStorage.getItem('pnu-inst-x'))return;if(document.getElementById('instBar'))return;const d=document.createElement('div');d.className='install';d.id='instBar';
+  d.innerHTML='<span style="font-size:22px">📲</span><b>홈 화면에 추가하면 앱처럼 전체 화면으로 쓸 수 있어요</b><button type="button" id="instGo" style="background:#fff;color:#0b4ea2">설치</button><button type="button" id="instNo" style="background:#ffffff22;color:#fff" aria-label="닫기">✕</button>';
+  phone.appendChild(d);d.querySelector('#instGo').onclick=()=>{d.remove();if(installEvt){installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null})}else openDrawer('install')};
+  d.querySelector('#instNo').onclick=()=>{d.remove();try{sessionStorage.setItem('pnu-inst-x','1')}catch(e){}}}
+const panelEl=document.querySelector('.stage>.panel'),stageEl=document.querySelector('.stage');
+function renderDrawer(){if(panelEl&&panelEl.parentElement!==stageEl){panelEl.classList.remove('inDrawer');stageEl.appendChild(panelEl)}const items=MENU.map(([k,e,t,d])=>`<button class="mitem" type="button" data-panel="${k}"><span class="ico">${e}</span><span><b>${t}${k==='quiz'&&quizAvailable()?' <span class="tag info">오늘 도전 가능</span>':''}</b><span class="d">${d}</span></span></button>`).join('');
+  const P={quiz:quizHtml,shop:shopHtml,report:reportHtml,alert:alertHtml,hist:histHtml,share:shareHtml,settings:settingsHtml,about:aboutHtml,install:installHtml,demo:()=>'<div id="demoSlot"></div>'}[S.panel];
   const title=S.panel?MENU.find(m=>m[0]===S.panel)[2]:'더보기';
   drawerEl.innerHTML=`<header><div><h2>${title}</h2><small>내 포인트 ${S.pts.toLocaleString()}P</small></div><div style="display:flex;gap:6px">${S.panel?'<button class="x" type="button" data-panel="" aria-label="목록으로">‹</button>':''}<button class="x" id="drClose" type="button" aria-label="닫기">✕</button></div></header>
     <div class="body">${P?P():items}</div>`;
+  if(S.panel==='demo'){const sl=document.getElementById('demoSlot');panelEl.classList.add('inDrawer');sl.appendChild(panelEl)}
   if(S.panel==='quiz'&&quizRun&&quizRun.picked===null)drawQuizTimer()}
 fabEl.addEventListener('click',()=>openDrawer(null));scrimEl.addEventListener('click',closeDrawer);
 drawerEl.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
@@ -1053,9 +1181,12 @@ drawerEl.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
   if(t.dataset.panel!==undefined){const p=t.dataset.panel||null;if(p==='walk'){closeDrawer();goHome('map');S.walkPick=true;toast('목적지를 고른 뒤 "차 없이 걸어서 가기"를 누르세요.');return}
     if(S.panel==='quiz'&&p!=='quiz')stopQuizTimer();S.panel=p;renderDrawer();if(p==='quiz'&&S.quiz&&S.quiz.day===todayKey()&&!S.quiz.done&&!quizRun){S.quiz.done=true;S.pts+=S.quiz.score;S.ptsLog.unshift({t:Date.now(),d:'오늘의 퀴즈(중단) '+S.quiz.right+'/'+QN,p:S.quiz.score});persist();renderDrawer()}return}
   if(t.id==='qStart'){startQuiz();return}
+  if(t.id==='doInstall'&&installEvt){installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;renderDrawer()});return}
+  if(t.id==='copyUrl'){const ta=document.getElementById('instUrl');try{navigator.clipboard.writeText(ta.value).then(()=>toast('주소를 복사했어요'),()=>{ta.select()})}catch(x){ta.select()}return}
   if(t.dataset.ans!==undefined){answerQ(+t.dataset.ans);return}
-  if(t.dataset.buy!==undefined){const[e,n,p]=SHOP[+t.dataset.buy];if(S.pts<p)return;S.pts-=p;const code=('GS'+Date.now().toString(36)+Math.floor(performance.now()%1000).toString(36)).toUpperCase().slice(0,12);
-    S.coupons.unshift({e,n,p,code,t:Date.now(),used:false});S.ptsLog.unshift({t:Date.now(),d:n+' 교환',p:-p});persist();renderDrawer();toast(`${n} 쿠폰을 받았어요`);return}
+  if(t.dataset.cat){S.shopCat=t.dataset.cat;renderDrawer();return}
+  if(t.dataset.buy!==undefined){const[e,n,,p]=SHOP[+t.dataset.buy];if(S.pts<p)return;S.pts-=p;const code=('PNU'+Date.now().toString(36)+Math.floor(performance.now()%1000).toString(36)).toUpperCase().slice(0,12);
+    S.coupons.unshift({e,n,p,code,t:Date.now(),used:false});S.ptsLog.unshift({t:Date.now(),d:n+' 교환',p:-p});persist();S.shopCat='쿠폰';renderDrawer();toast(`${n} 쿠폰을 받았어요`);return}
   if(t.dataset.use!==undefined){S.coupons[+t.dataset.use].used=true;persist();renderDrawer();return}
   if(t.id==='rpSend'){const f=document.getElementById('rpFile'),d=document.getElementById('rpDesc').value.trim();const L=reportLoc();if(!d&&!(f.files&&f.files[0])){toast('사진이나 내용을 넣어 주세요.');return}
     S.reports.unshift({type:document.getElementById('rpType').value,desc:d,photo:f.files&&f.files[0]?f.files[0].name:'',loc:L.label.split(' (')[0],x:L.x,y:L.y,t:Date.now(),status:'접수됨(시연)'});persist();renderDrawer();toast('신고가 접수되었어요(시연).');return}
@@ -1179,11 +1310,13 @@ window.addEventListener('pointerup',e=>{if(!drag||e.pointerId!==drag.id)return;c
 window.addEventListener('resize',()=>placeFab());
 window.addEventListener('pointercancel',()=>{if(drag){drag.sh.classList.remove('dragging');drag.sh.style.maxHeight='';drag=null}});
 
+setAppMode();addEventListener('resize',setAppMode);
 if(window.THREE&&THREE.OrbitControls&&typeof DATA!=="undefined"){panelSync();build();applyDaylight(true);render();gpsUI();startGPS();
   if(S.quiz&&S.quiz.day===todayKey()&&!S.quiz.done){S.quiz.done=true;S.pts+=S.quiz.score;persist()} // 퀴즈 도중 새로고침하면 그때까지 점수로 마감
 
   ui.addEventListener('input',e=>{const t=e.target;if(t.id==='rvPlate')S.rv.plate=t.value;if(t.id==='rvPurpose')S.rv.purpose=t.value});
   ui.addEventListener('change',e=>{const t=e.target;if(t.id==='rvLot'){S.rv.lot=t.value;render()}if(t.id==='rvStart'){S.rv.start=+t.value;render()}if(t.id==='rvPlate'||t.id==='rvPurpose')render()});
+  setTimeout(()=>{if(isIOS()&&!isStandalone()&&location.protocol==='https:')showInstallBar()},4000);
   window.__dbg={S,frame:(n=1,dt=1/30)=>{for(let i=0;i<n;i++)frame(dt)},get navS(){return navS},get R(){return R},get car(){return car},openDrawer,applyDaylight}}
 else document.getElementById('loading').textContent='지도를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.';
 </script>
