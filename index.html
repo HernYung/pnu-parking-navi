@@ -727,7 +727,7 @@ function build(){
    spots.forEach((b,i)=>{const p=W(b[0]+3,b[1]+3);m4.makeTranslation(p.x,p.y+2.3,p.z);core.setMatrixAt(i,m4);halo.setMatrixAt(i,m4);m4.makeTranslation(p.x,p.y+1.1,p.z);pole.setMatrixAt(i,m4)});
    lamps.add(pole,core,halo);lamps.userData={core,halo};scene.add(lamps)}
   walker=new THREE.Group();{const wm=new THREE.MeshLambertMaterial({color:'#12a07e'});const body=new THREE.Mesh(new THREE.CylinderGeometry(.45,.55,1.6,10),wm);body.position.y=1;const head=new THREE.Mesh(new THREE.SphereGeometry(.42,12,10),new THREE.MeshLambertMaterial({color:'#ffe0c2'}));head.position.y=2.15;
-   const ring=new THREE.Mesh(new THREE.CircleGeometry(1.8,28),new THREE.MeshBasicMaterial({color:'#12a07e',transparent:true,opacity:.22,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.3;walker.add(ring,body,head)}walker.visible=false;scene.add(walker);
+   const ring=new THREE.Mesh(new THREE.CircleGeometry(1.8,28),new THREE.MeshBasicMaterial({color:'#12a07e',transparent:true,opacity:.22,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.3;walker.add(ring,body,head)}walker.scale.setScalar(.5);walker.visible=false;scene.add(walker);
   carPin=new THREE.Group();{const pm=new THREE.MeshLambertMaterial({color:'#c4302a'});const st=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,3,8),pm);st.position.y=1.5;const hd=new THREE.Mesh(new THREE.SphereGeometry(.7,16,12),pm);hd.position.y=3.2;carPin.add(st,hd)}carPin.visible=false;scene.add(carPin);
   const sh=new THREE.Shape();sh.moveTo(0,1.6);sh.lineTo(1.15,-1.1);sh.lineTo(0,-.45);sh.lineTo(-1.15,-1.1);sh.closePath();
   const cg=new THREE.ExtrudeGeometry(sh,{depth:.35,bevelEnabled:false});cg.rotateX(Math.PI/2);cg.translate(0,.7,0);
@@ -1285,7 +1285,7 @@ function frame(dt){
   if(S.mode==='walk'&&R){
     if(useGps()&&inGrid(gpsXY().x,gpsXY().y)&&S.walkGps){const g=gpsXY();navS=Math.max(navS,project(R,g).s);if(R.len-navS<12)navS=R.len}else navS=Math.min(R.len,navS+dt*9*S.speed);
     const p=pointAt(R,navS),pos=W(p.x,p.y);const ang=Math.atan2(p.dx,p.dy);walker.position.copy(pos);let da=ang-walker.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));walker.rotation.y+=da*.2;
-    if(!followOff){const dir=new THREE.Vector3(Math.sin(walker.rotation.y),0,Math.cos(walker.rotation.y));camera.position.lerp(pos.clone().addScaledVector(dir,-15).add(new THREE.Vector3(0,11,0)),.07);controls.target.lerp(pos.clone().addScaledVector(dir,7),.1)}
+    if(!followOff){const dir=new THREE.Vector3(Math.sin(walker.rotation.y),0,Math.cos(walker.rotation.y));camera.position.lerp(pos.clone().addScaledVector(dir,-19).add(new THREE.Vector3(0,14,0)),.07);controls.target.lerp(pos.clone().addScaledVector(dir,9),.1)}
     const nxt=INS.find(i=>i.at>navS-1);if(nxt){const d=nxt.at-navS,key='w'+nxt.at+nxt.type;if(d<35&&!spoken.has(key)){spoken.add(key);speak(nxt.type==='arrive'?`곧 ${nxt.text}합니다.`:`${fmtDist(d)} 앞 ${nxt.text.replace(' · ',', ')}`)}}
     trimRoute(navS);acc+=dt;if(acc>.25){acc=0;updateWalk()}
     if(navS>=R.len){S.mode='walkDone';S.sheet='mid';routeGroup.visible=false;speak(`${short(R.lot.name)}에 도착했습니다.`);render()}}
